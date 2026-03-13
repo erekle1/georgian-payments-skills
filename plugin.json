@@ -1,0 +1,6 @@
+{
+  "name": "georgian-payments-skills",
+  "description": "AI agent skills for Georgian bank API integration — TBC Bank and Bank of Georgia PSD2 Open Banking, OAuth2, AIS, PIS, iPay, TPay, installments",
+  "author": { "name": "Georgian Banks Skills Contributors" },
+  "keywords": ["georgian-banks", "tbc-bank", "bank-of-georgia", "psd2", "open-banking", "payments", "oauth2", "ipay", "tpay", "ais", "pis", "installments"]
+}

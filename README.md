@@ -1,8 +1,11 @@
 # Georgian Banks AI Skills
 
-> AI assistant skills for integrating with Georgian bank APIs — TBC Bank and Bank of Georgia (BOG). Drop these into any AI coding assistant that supports skills/context files and get expert-level API guidance instantly.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Skills: 2](https://img.shields.io/badge/Skills-2-green.svg)](#whats-inside)
 
-## What's inside
+> AI assistant skills for integrating with Georgian bank APIs — TBC Bank and Bank of Georgia (BOG). Drop these into any AI coding assistant and get expert-level API guidance instantly.
+
+## What's Inside
 
 | Skill | Covers |
 |-------|--------|
@@ -15,108 +18,110 @@ Each skill contains:
 
 ---
 
-## Installation
+## Quick Install
 
-### Claude Code (Claude.ai CLI)
+### npx skills (universal — 37+ agents)
 
-Copy skills into `~/.claude/skills/`:
+The [`skills`](https://www.npmjs.com/package/skills) npm package supports Claude Code, Cursor, Codex, Windsurf, OpenCode, and 37+ more agents. One command installs to all detected agents:
 
 ```bash
-# Clone the repo
-git clone https://github.com/your-org/georgian-banks-skills
-cd georgian-banks-skills
+# Install to ALL detected agents at once
+npx skills add erekle1/georgian-payments-skills --all
 
-# Install both skills
+# Or install to specific agents only
+npx skills add erekle1/georgian-payments-skills -a claude-code -a cursor -a windsurf
+```
+
+### skillkit (44 agents, auto-translate)
+
+[SkillKit](https://github.com/nicholasb2101/skillkit) is the open-source package manager for AI agent skills — write once, deploy to 44 agents:
+
+```bash
+npm install -g skillkit
+
+# Install skill to all detected agents
+skillkit install erekle1/georgian-payments-skills
+
+# Translate to a specific agent's format
+skillkit translate tbc-bank-api --to cursor
+skillkit translate bank-of-georgia-api --to codex
+```
+
+### Antigravity Skills (symlink method)
+
+If you use the [Antigravity Skills](https://github.com/guanyang/antigravity-skills) framework:
+
+```bash
+# Project-level installation
+mkdir -p .agent/skills
+ln -s ~/path/to/georgian-payments-skills/tbc-bank-api .agent/skills/
+ln -s ~/path/to/georgian-payments-skills/bank-of-georgia-api .agent/skills/
+
+# Global installation (Claude Code)
+ln -s ~/path/to/georgian-payments-skills/tbc-bank-api ~/.claude/skills/
+ln -s ~/path/to/georgian-payments-skills/bank-of-georgia-api ~/.claude/skills/
+```
+
+---
+
+## Manual Installation
+
+### Claude Code
+
+```bash
+git clone https://github.com/erekle1/georgian-payments-skills
+cd georgian-payments-skills
+
 cp -r tbc-bank-api ~/.claude/skills/
 cp -r bank-of-georgia-api ~/.claude/skills/
 ```
 
-Skills are picked up automatically — no restart needed. Trigger them by mentioning TBC Bank or BOG in your coding questions.
+Skills are picked up automatically — no restart needed.
 
-**Verify installation:**
+**Verify:**
 ```bash
 ls ~/.claude/skills/
-# tbc-bank-api/   bank-of-georgia-api/   ...
+# tbc-bank-api/   bank-of-georgia-api/
 ```
 
 ---
 
 ### Cursor
 
-Cursor uses `.cursor/rules` for persistent context. Install as project rules:
+Install as project rules:
 
 ```bash
-# In your project root
 mkdir -p .cursor/rules
-
-cp -r path/to/georgian-banks-skills/tbc-bank-api .cursor/rules/
-cp -r path/to/georgian-banks-skills/bank-of-georgia-api .cursor/rules/
+cp -r path/to/georgian-payments-skills/tbc-bank-api .cursor/rules/
+cp -r path/to/georgian-payments-skills/bank-of-georgia-api .cursor/rules/
 ```
 
-Or add as a global rule in **Cursor Settings → Rules → User Rules**:
-
-1. Open Cursor → `Cmd/Ctrl + Shift + P` → "Open Cursor Settings"
-2. Go to **Rules** tab
-3. Paste the contents of `tbc-bank-api/SKILL.md` or `bank-of-georgia-api/SKILL.md` into a new rule
-4. Reference individual `references/` files as needed
-
-**Pro tip:** For Cursor with large codebases, add a `.cursorrules` file at your project root:
-
-```bash
-cat tbc-bank-api/SKILL.md > .cursorrules
-# or for BOG:
-cat bank-of-georgia-api/SKILL.md > .cursorrules
-```
+Or add as a global rule: **Cursor Settings → Rules → User Rules** → paste the contents of `SKILL.md`.
 
 ---
 
 ### GitHub Copilot (VS Code)
 
-Copilot uses VS Code's custom instructions feature.
-
-**Per-workspace (recommended):**
-
-1. Create `.github/copilot-instructions.md` in your project root:
-
 ```bash
 mkdir -p .github
 cat tbc-bank-api/SKILL.md > .github/copilot-instructions.md
-# Append reference files if needed:
+# Append reference files as needed:
 cat tbc-bank-api/references/auth.md >> .github/copilot-instructions.md
 ```
-
-2. VS Code picks this up automatically for Copilot Chat in that workspace.
-
-**Global instructions:**
-1. Open VS Code → Settings (`Cmd/Ctrl + ,`)
-2. Search for `github.copilot.chat.codeGeneration.instructions`
-3. Add the skill content as a string value
 
 ---
 
 ### Windsurf (Codeium)
 
-Windsurf supports `.windsurfrules` for persistent AI context:
-
 ```bash
-# In your project root
 cat tbc-bank-api/SKILL.md > .windsurfrules
-echo "" >> .windsurfrules
+# Append references as needed:
 cat tbc-bank-api/references/auth.md >> .windsurfrules
-cat tbc-bank-api/references/pis.md >> .windsurfrules
-```
-
-Or for BOG:
-```bash
-cat bank-of-georgia-api/SKILL.md > .windsurfrules
-cat bank-of-georgia-api/references/installments.md >> .windsurfrules
 ```
 
 ---
 
 ### Zed Editor
-
-Zed supports assistant context via the `.zed/assistant_context` directory:
 
 ```bash
 mkdir -p .zed
@@ -124,39 +129,16 @@ cp tbc-bank-api/SKILL.md .zed/tbc-bank-api.md
 cp bank-of-georgia-api/SKILL.md .zed/bank-of-georgia-api.md
 ```
 
-Then reference them in Zed's assistant with `/file .zed/tbc-bank-api.md`.
-
----
-
-### Any AI Chat (ChatGPT, Claude.ai, Gemini, etc.)
-
-Paste the relevant `SKILL.md` content as a system prompt or at the start of your conversation. Then paste the specific `references/*.md` file when you need deep-dive help on a topic.
-
-```
-# Paste this at the start of your chat:
-[contents of tbc-bank-api/SKILL.md]
-
-# Then ask:
-"How do I initiate a recurring payment?"
-# → AI will tell you to read pis.md, paste that too if needed
-```
+Reference in Zed's assistant with `/file .zed/tbc-bank-api.md`.
 
 ---
 
 ### Continue.dev (VS Code / JetBrains)
 
-Add as a context provider in `.continue/config.json`:
+Add to `.continue/config.json`:
 
 ```json
 {
-  "contextProviders": [
-    {
-      "name": "file",
-      "params": {
-        "nRetrieve": 10
-      }
-    }
-  ],
   "customCommands": [
     {
       "name": "tbc",
@@ -176,11 +158,13 @@ Add as a context provider in `.continue/config.json`:
 
 ### JetBrains AI Assistant
 
-1. Open any JetBrains IDE (IntelliJ, WebStorm, PyCharm, etc.)
-2. Go to **Tools → AI Assistant → Personalization**
-3. Add a new "Instruction" with the contents of `SKILL.md`
+**Tools → AI Assistant → Personalization** → add `SKILL.md` content as an instruction, or reference it with `@tbc-bank-api/SKILL.md` in chat.
 
-Or use the **@file** mention in AI chat: open the `SKILL.md` file and reference it with `@tbc-bank-api/SKILL.md` in your AI prompt.
+---
+
+### Any AI Chat (ChatGPT, Claude.ai, Gemini, etc.)
+
+Paste the `SKILL.md` content as a system prompt or at the start of your conversation. Paste specific `references/*.md` files when you need deep-dive help.
 
 ---
 
@@ -209,8 +193,9 @@ What's the full PSD2 payment initiation flow for Bank of Georgia?
 ## Skill Structure
 
 ```
-georgian-banks-skills/
+georgian-payments-skills/
 ├── README.md
+├── plugin.json
 ├── tbc-bank-api/
 │   ├── SKILL.md                 ← Quick reference, base URLs, workflows
 │   └── references/
@@ -236,7 +221,12 @@ georgian-banks-skills/
 
 Pull requests welcome. If you spot outdated endpoints, missing examples, or want to add more Georgian bank integrations — open an issue or PR.
 
-The source API documentation used to build these skills:
+### Distribution
+
+This repo is listed on [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — the community directory of AI agent skills compatible with Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, Windsurf, and more.
+
+### Source Documentation
+
 - TBC Bank Developer Portal: [developers.tbcbank.ge](https://developers.tbcbank.ge)
 - Bank of Georgia API Docs: [api.bog.ge/docs](https://api.bog.ge/docs)
 

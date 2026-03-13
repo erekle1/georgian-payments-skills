@@ -1,6 +1,11 @@
 ---
 name: bank-of-georgia-api
-description: Expert guide for integrating Bank of Georgia (BOG) APIs — Open Banking PSD2, iPay payment gateway, installment loans, BOG SDK (BOG.Calculator, BOG.SmartButton), OAuth2, and banking products. Use this skill whenever the user mentions Bank of Georgia, BOG, bog.ge, api.bog.ge, iPay, BOG installments, BOG SDK, Georgian bank integration, or any BOG-related development. Trigger even if they just say "BOG" in a tech/banking context.
+description: >
+  Expert guide for integrating Bank of Georgia (BOG) APIs — Open Banking PSD2, iPay payment gateway,
+  installment loans, BOG SDK (BOG.Calculator, BOG.SmartButton), OAuth2, and banking products.
+  Use this skill whenever the user mentions Bank of Georgia, BOG, bog.ge, api.bog.ge, iPay, BOG installments,
+  BOG SDK, Georgian bank integration, or any BOG-related development. Trigger even if they just say "BOG" in a tech/banking context.
+license: MIT
 ---
 
 # Bank of Georgia API Integration Guide
