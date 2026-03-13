@@ -1,0 +1,11 @@
+# Raw source docs (large, regenerated from bank portals)
+tbc.md
+bankofgeogia.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
