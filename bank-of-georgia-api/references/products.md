@@ -49,6 +49,55 @@ GET /0.8/banking/products/{locale}/mortgages
 }
 ```
 
+## Bank Transaction Codes
+
+Retrieve information about bank transaction codes (ISO 20022 and proprietary).
+
+```http
+GET /websites/api_bog_ge_en/bankTransactionCode
+Authorization: Bearer {token}
+```
+
+**Query Parameters:**
+- `bankTransactionCode` (string) — ISO 20022 structured code
+- `proprietaryBankTransactionCode` (string) — ASPSP-specific code
+- `merchantCategoryCode` (string) — MCC
+- `frequencyCode` (string) — `Daily`, `Weekly`, `Monthly`, `Quarterly`, `Annual`, etc.
+- `frequencyPerDay` (integer) — Max frequency per day
+- `dayOfExecution` (string) — Day of execution (e.g., `15`, `31` for ultimo)
+- `monthsOfExecution` (array) — For `MonthlyVariable` frequency
+
+## Account Activity (Websites API)
+
+Retrieve daily account activities with detailed transaction metadata.
+
+```http
+GET /websites/api_bog_ge_en/account/activity?format={json|xml}
+Authorization: Bearer {token}
+```
+
+**Response Example (JSON):**
+```json
+[
+  {
+    "Id": 1,
+    "DocNo": "sample-001",
+    "PostDate": "2021-06-18T14:01:32.680Z",
+    "EntryType": "TRANSFER",
+    "Amount": 12.0,
+    "PayerName": "John Doe",
+    "Sender": {
+      "AccountNumber": "GE50BG...",
+      "BankCode": "BAGAGE22"
+    },
+    "Beneficiary": {
+      "AccountNumber": "GE99...",
+      "Name": "Vendor Ltd"
+    }
+  }
+]
+```
+
 ## Account Statements (BOOnline)
 
 For business accounts integrated with BOOnline.
@@ -117,6 +166,38 @@ Content-Type: application/json
   "creditorName": "Vendor Ltd",
   "purpose": "Invoice payment #INV-001",
   "transactionCode": "00"
+}
+```
+
+## Package Documents (Bulk Transfers)
+
+Create one or more package documents for domestic or foreign currency transfers.
+
+```http
+POST /websites/api_bog_ge_en?fileName={packageName}
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body Example:**
+```json
+{
+  "UniqueId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "Amount": 1000.50,
+  "SourceAccountNumber": "GE50BG...",
+  "BeneficiaryName": "John Doe",
+  "BeneficiaryAccountNumber": "GE0987...",
+  "PaymentDetail": "Payment for services rendered",
+  "ValueDate": "2024-10-27",
+  "Charges": "SHA"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Package document created successfully."
 }
 ```
 

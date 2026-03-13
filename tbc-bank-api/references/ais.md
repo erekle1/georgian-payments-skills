@@ -58,13 +58,13 @@ X-Request-ID: {uuid}
     "iban": "GE01TB2123003210034512",
     "msisdn": "558112233",
     "currency": "USD",
-    "ownerName": "John Doe",
+    "ownerName": "მოქი მოქიაშვილი",
     "ownerIdentification": {
       "privateId": {
         "others": [{ "identification": "PNOGE-00000000001" }]
       }
     },
-    "name": "John Doe",
+    "name": "მოქი მოქიაშვილი",
     "displayName": "My Card",
     "cashAccountType": "CARD",
     "status": "enabled",
@@ -72,9 +72,9 @@ X-Request-ID: {uuid}
     "usage": "PRIV",
     "balances": [],
     "_links": {
-      "balances": { "href": "/0.8/v1/accounts/{accountId}/balances" },
-      "transactions": { "href": "/0.8/v1/accounts/{accountId}/transactions" },
-      "account": { "href": "/0.8/v1/accounts/{accountId}" }
+      "balances": { "href": "/0.8/v1/accounts/{id}/balances" },
+      "transactions": { "href": "/0.8/v1/accounts/{id}/transactions" },
+      "account": { "href": "/0.8/v1/accounts/{id}" }
     }
   }
 }
@@ -104,10 +104,6 @@ X-Request-ID: {uuid}
       "creditLimitIncluded": false,
       "referenceDate": "2025-03-26",
       "lastChangeDateTime": "2025-03-26T00:00:00"
-    },
-    {
-      "balanceType": "closingBooked",
-      "balanceAmount": { "currency": "GEL", "amount": "-30.00" }
     }
   ]
 }

@@ -31,15 +31,25 @@ Content-Type: application/json
   ],
   "locale": "en",
   "shop_order_id": "YOUR-ORDER-123",
-  "redirect_links": {
-    "success": "https://yourshop.com/payment/success?order=YOUR-ORDER-123",
-    "fail": "https://yourshop.com/payment/fail?order=YOUR-ORDER-123",
-    "cancel": "https://yourshop.com/payment/cancel?order=YOUR-ORDER-123"
+  "payment_method": ["card", "google_pay", "apple_pay", "bog_p2p", "bnpl"],
+  "config": {
+    "loan": { "type": "INSTALLMENT_0", "month": 12 },
+    "campaign": { "card": "visa", "type": "restrict" }
   },
-  "show_shop_order_id_on_extract": true,
-  "capture_method": "AUTOMATIC"
+  "redirect_links": {
+    "success": "https://yourshop.com/payment/success",
+    "fail": "https://yourshop.com/payment/fail"
+  }
 }
 ```
+
+**Payment Methods:**
+- `card` — Standard Visa/MC/Amex
+- `google_pay` / `apple_pay`
+- `bog_p2p` — Bank of Georgia P2P transfer
+- `bog_loyalty` — MR/Plus points
+- `bnpl` / `bog_loan` — Installments/Buy Now Pay Later
+- `gift_card` — BOG Gift Cards
 
 **Response:**
 ```json

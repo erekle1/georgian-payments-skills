@@ -1,10 +1,6 @@
 ---
 name: tbc-bank-api
-description: >
-  Expert guide for integrating TBC Bank's Open Banking APIs (PSD2, AIS, PIS, TPay, installments, OAuth2).
-  Use this skill whenever the user mentions TBC Bank, tbcbank.ge, Georgian bank APIs, PSD2 integration with TBC,
-  account information services, payment initiation with TBC, TPay gateway, TBC installments, or any work involving
-  TBC Bank developer APIs. Trigger even if they just say "TBC" in a banking context.
+description: Use when the user mentions TBC Bank, tbcbank.ge, Georgian bank APIs, PSD2 integration with TBC, account information services (AIS), payment initiation (PIS) with TBC, TPay gateway, TBC installments, or any work involving TBC Bank developer APIs. Trigger even if they just say "TBC" in a banking context.
 license: MIT
 ---
 

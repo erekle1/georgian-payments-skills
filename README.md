@@ -34,7 +34,7 @@ npx skills add erekle1/georgian-payments-skills -a claude-code -a cursor -a wind
 
 ### skillkit (44 agents, auto-translate)
 
-[SkillKit](https://github.com/nicholasb2101/skillkit) is the open-source package manager for AI agent skills — write once, deploy to 44 agents:
+[SkillKit](https://github.com/rohitg00/skillkit) is the open-source package manager for AI agent skills — write once, deploy to 44 agents:
 
 ```bash
 npm install -g skillkit
@@ -85,8 +85,6 @@ ls ~/.claude/skills/
 ```
 
 ---
-
-### Cursor
 
 Install as project rules:
 
