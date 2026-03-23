@@ -1,12 +1,19 @@
 ---
 name: bank-of-georgia-api
-description: Use when the user mentions Bank of Georgia (BOG), bog.ge, api.bog.ge, iPay payment gateway, BOG installment loans, BOG SDK (BOG.Calculator, BOG.SmartButton), OAuth2, or any BOG-related development. Trigger even if they just say "BOG" in a tech/banking context.
-license: MIT
+description: >
+  Expert guide for integrating Bank of Georgia (BOG) APIs — Open Banking PSD2, iPay payment gateway,
+  installment loans, BOG SDK (BOG.Calculator, BOG.SmartButton), OAuth2, BOG-ID (SSO), Business Online
+  (BOnline) corporate banking, Payment Gateway (billing/service providers), and banking products.
+  Covers both bank-side API usage AND merchant-side implementation: webhook/callback handlers, redirect URLs,
+  idempotency, environment setup, registration documents, and go-live checklist.
+  Use this skill whenever the user mentions Bank of Georgia, BOG, bog.ge, api.bog.ge, iPay, BOG installments,
+  BOG SDK, BOG-ID, BOnline, Georgian bank integration, callback handling, merchant registration, or any BOG-related development.
+  Trigger even if they just say "BOG" in a tech/banking context.
 ---
 
 # Bank of Georgia API Integration Guide
 
-Complete reference for building with Bank of Georgia's Open Banking, iPay, and installment APIs.
+End-to-end reference for integrating BOG payment services — covering both the bank's APIs and everything the **merchant must build and register**.
 
 ## Quick Reference
 
@@ -17,6 +24,11 @@ Complete reference for building with Bank of Georgia's Open Banking, iPay, and i
 | iPay Payment Gateway | `references/ipay.md` |
 | Installment Loans + BOG SDK | `references/installments.md` |
 | Banking Products & Statements | `references/products.md` |
+| BOG-ID (Single Sign-On) | `references/bogid.md` |
+| Business Online (BOnline) | `references/bonline.md` |
+| Payment Gateway (Billing) | `references/payment-gateway.md` |
+| **Merchant Integration Guide** | **`references/merchant-integration.md`** |
+| **Merchant Registration & Documents** | **`references/merchant-documents.md`** |
 
 ## Base URLs
 
@@ -92,6 +104,38 @@ Two options:
 
 ### 5. Authentication
 → Read `references/auth.md` first
+
+### 5a. BOG-ID (Single Sign-On)
+Authenticate users with their BOG credentials. Supports scopes for personal info, documents, contacts.
+
+→ Read `references/bogid.md`
+
+### 5b. Business Online (Corporate Banking)
+Domestic/foreign transfers, statements, exchange rates, document signing with OTP.
+
+→ Read `references/bonline.md`
+
+### 5c. Payment Gateway (Billing/Service Providers)
+For utility/telecom service providers accepting payments via BOG interfaces. Supports Basic, OAuth2, API Key, HMAC-SHA256 auth.
+
+→ Read `references/payment-gateway.md`
+
+### 6. Merchant Integration (What YOU Must Build)
+1. Set up webhook/callback endpoints (HTTPS, idempotent, returns 200)
+2. Validate `shop_order_id` and `amount` before fulfilling
+3. Set up OAuth2 redirect handler (state param, code exchange)
+4. Configure environment variables (credentials + URLs)
+5. Handle duplicate webhook delivery (idempotency by `order_id` + `event`)
+
+→ Read `references/merchant-integration.md`
+
+### 7. Bank Registration & Go-Live Documents
+1. Register at `https://bonline.bog.ge` (iPay/installments) or `https://api.bog.ge` (PSD2)
+2. Prepare technical specification with your URLs
+3. Gather required business documents
+4. Submit go-live request after sandbox testing
+
+→ Read `references/merchant-documents.md`
 
 ## Response Conventions
 

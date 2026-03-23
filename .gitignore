@@ -1,6 +1,4 @@
 # Raw source docs (large, regenerated from bank portals)
-tbc.md
-bankofgeogia.md
 local_docs/
 
 # OS
@@ -11,3 +9,12 @@ Thumbs.db
 .vscode/
 *.swp
 
+# Dependencies
+node_modules/
+
+# Build/scraping artifacts
+venv/
+*.pyc
+package.json
+package-lock.json
+scrape_bog.py

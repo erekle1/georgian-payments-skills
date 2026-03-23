@@ -37,9 +37,13 @@ Content-Type: application/json
     "campaign": { "card": "visa", "type": "restrict" }
   },
   "redirect_links": {
-    "success": "https://yourshop.com/payment/success",
-    "fail": "https://yourshop.com/payment/fail"
-  }
+    "success": "https://yourshop.com/payment/success?order=YOUR-ORDER-123",
+    "fail": "https://yourshop.com/payment/fail?order=YOUR-ORDER-123",
+    "cancel": "https://yourshop.com/payment/cancel?order=YOUR-ORDER-123"
+  },
+  "show_shop_order_id_on_extract": true,
+  "capture_method": "AUTOMATIC"
+  
 }
 ```
 

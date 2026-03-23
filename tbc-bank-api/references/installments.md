@@ -1,134 +1,145 @@
-# TBC Bank Online Installments API
+# TBC Online Installment Loans
 
-Enables merchants to offer installment loans to customers at checkout.
+## Base URLs
 
-## Flow Overview
+| Environment | URL |
+|-------------|-----|
+| Test | `https://test-api.tbcbank.ge` |
+| Production | `https://api.tbcbank.ge` |
 
-1. Merchant creates installment application → gets `sessionId`
-2. Redirect customer to TBC Bank installment page
-3. Customer applies for and accepts installment loan
-4. TBC notifies merchant via callback
-5. Merchant polls status or uses callback to fulfill order
+Authentication: Bearer token in `Authorization` header.
+
+---
 
 ## Create Application
 
 ```http
 POST /v1/online-installments/applications
 Authorization: Bearer {token}
+apikey: {api_key}
 Content-Type: application/json
-X-Request-ID: {uuid}
-```
 
-**Request Body:**
-```json
 {
-  "merchantKey": "YOUR_MERCHANT_KEY",
+  "merchantKey": "your_merchant_key",
+  "campaignId": "campaign_id",
   "priceTotal": 1500.00,
-  "campaignId": "CAMPAIGN_001",
-  "invoiceId": "INV-2023-001",
   "products": [
-    {
-      "name": "Samsung Galaxy S23",
-      "price": 1500.00,
-      "quantity": 1
-    }
+    { "name": "Samsung TV", "price": 1500.00, "quantity": 1 }
   ],
-  "additionalText": "Optional message to customer",
-  "callbackUrl": "https://yourshop.com/installment/callback"
+  "invoiceId": "SHOP-ORDER-001"
 }
 ```
 
-**Response:**
-```json
-{
-  "sessionId": "sess-abc-123",
-  "status": "created",
-  "redirectUrl": "https://installments.tbcbank.ge/apply?session=sess-abc-123"
-}
+**Response:** HTTP 200 with `Location` header containing redirect URL for customer.
+- `sessionId` in response body — use for subsequent operations
+- `Id` field always returns null (ignore it)
+
+Redirect customer to URL from `Location` header to fill loan application.
+
+---
+
+## Cancel Application
+
+```http
+POST /v1/online-installments/applications/{session-id}/cancel
+Authorization: Bearer {token}
+apikey: {api_key}
 ```
 
-## Redirect Customer
+---
 
-After receiving `redirectUrl`, redirect the customer's browser:
+## Confirm Application
 
-```javascript
-window.location.href = response.redirectUrl;
-// or
-res.redirect(response.redirectUrl);
+```http
+POST /v1/online-installments/applications/{session-id}/confirm
+Authorization: Bearer {token}
+apikey: {api_key}
 ```
+
+---
 
 ## Check Application Status
 
 ```http
-GET /v1/online-installments/applications/{sessionId}/status
+GET /v1/online-installments/applications/{session-id}/status
 Authorization: Bearer {token}
-X-Request-ID: {uuid}
+apikey: {api_key}
+```
+
+---
+
+## Merchant Status Changes (Polling)
+
+```http
+GET /v1/online-installments/merchant/applications/status-changes
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "merchantKey": "your_merchant_key",
+  "take": 100
+}
 ```
 
 **Response:**
 ```json
 {
-  "sessionId": "sess-abc-123",
-  "status": "approved",
-  "invoiceId": "INV-2023-001",
-  "approvedAmount": 1500.00,
-  "currency": "GEL"
+  "synchronizationRequestId": "req-uuid",
+  "totalCount": 5,
+  "statusChanges": [
+    {
+      "sessionId": "session-uuid",
+      "statusId": 1,
+      "statusDescription": "In Progress",
+      "changeDate": "2024-01-15 10:30:00.0",
+      "amount": 1500.00,
+      "contributionAmount": 0.00
+    }
+  ]
 }
 ```
 
-**Status values:**
-- `created` — Application just initiated
-- `pending` — Customer in process of applying
-- `approved` — Loan approved, payment complete
-- `rejected` — Loan rejected
-- `cancelled` — Customer cancelled
-- `expired` — Session timed out
-
-## Get Status Changes (Bulk Polling)
+### Confirm Synchronization
 
 ```http
-GET /v1/online-installments/merchant/applications/status-changes
-  ?fromDate=2023-06-01
-  &toDate=2023-06-30
+POST /v1/online-installments/merchant/applications/status-changes-sync
 Authorization: Bearer {token}
-X-Request-ID: {uuid}
+Content-Type: application/json
+
+{ "synchronizationRequestId": "req-uuid" }
 ```
 
-Use for reconciliation and catching any missed callbacks.
+---
 
-## Callback Handling
+## Status IDs
 
-TBC Bank POSTs to your `callbackUrl` when status changes:
+| ID | Description |
+|----|-------------|
+| 0 | Pending client authentication |
+| 1 | In Progress |
+| (2-13) | Various processing/completion states |
 
-```json
-{
-  "sessionId": "sess-abc-123",
-  "status": "approved",
-  "invoiceId": "INV-2023-001",
-  "approvedAmount": 1500.00,
-  "currency": "GEL",
-  "timestamp": "2023-06-15T10:30:00Z"
-}
-```
+---
 
-**Callback handler example (Node.js/Express):**
-```javascript
-app.post('/installment/callback', (req, res) => {
-  const { sessionId, status, invoiceId } = req.body;
+## Go-Live
 
-  if (status === 'approved') {
-    // Fulfill the order for invoiceId
-    fulfillOrder(invoiceId);
-  }
+Email `merchant.support@tbcbank.ge` to receive:
+- `merchantKey` — Unique merchant identifier
+- `campaignId` — Campaign identifier for installment terms
 
-  // Must return 200 to acknowledge
-  res.status(200).send('OK');
-});
-```
+---
 
-## Credentials Setup
+## Testing Flow
 
-1. Register at TBC Bank developer portal: `https://developers.tbcbank.ge`
-2. Create an application and get `merchantKey`, `client_id`, `client_secret`
-3. Configure callback URL in portal
-4. Use sandbox: `https://test-api.tbcbank.ge` for testing
+1. Get access token
+2. Call `POST /v1/online-installments/applications` to initiate
+3. Get `sessionId` from response
+4. Test cancel: `POST /v1/online-installments/applications/{session-id}/cancel`
+5. Test confirm: `POST /v1/online-installments/applications/{session-id}/confirm`
+6. `Location` header has redirect URL for customer
+7. Send one COMPLETE and one CANCELED sessionId to `developers@tbcbank.ge`
+
+**Common errors:**
+- 404: Merchant not found or deactivated
+- 400: Missing/invalid parameters
+- 401: Expired session or token

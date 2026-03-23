@@ -53,30 +53,15 @@ X-Request-ID: {uuid}
 Response: { "consentStatus": "valid" }
 ```
 
-### Manage Consent Authorisations
-
-Retrieve all authorisation sub-resources or check a specific SCA status.
+### Get Consent Authorisation Sub-Resources
 
 ```http
 GET /0.8/psd2/v1/consents/{consentId}/authorisations
-GET /0.8/psd2/v1/consents/{consentId}/authorisations/{authorisationId}
 Authorization: Bearer {token}
 X-Request-ID: {uuid}
 ```
 
-**Response (List):**
-```json
-{
-  "_links": {
-    "authorisation-1": { "href": "/v1/consents/{id}/authorisations/{authId}" }
-  }
-}
-```
-
-**Response (Status):**
-```json
-{ "scaStatus": "received" }
-```
+Uses `consentId` path param (string): ID returned by the consent creation.
 
 ### List Accounts
 
@@ -173,19 +158,13 @@ X-Request-ID: {uuid}
 PSU-IP-Address: {ip}
 ```
 
-**Common Products:** `domestic-credit-transfers-gel`, `sepa-credit-transfers`, `aspsp`, `instant`, `foreign`
-
-**Periodic SCT Request Example:**
 ```json
 {
-  "instructedAmount": { "currency": "GEL", "amount": "123.00" },
-  "debtorAccount": { "iban": "GE50BG..." },
-  "creditorName": "Merchant123",
-  "creditorAccount": { "iban": "GE00BG..." },
-  "startDate": "2024-03-01",
-  "frequency": "Monthly",
-  "dayOfExecution": "01",
-  "executionRule": "preceding"
+  "debtorAccount": { "iban": "GE50BG0000000001234567" },
+  "instructedAmount": { "currency": "GEL", "amount": "200.00" },
+  "creditorAccount": { "iban": "GE99XX0000000000000001" },
+  "creditorName": "Merchant Ltd",
+  "remittanceInformationUnstructured": "Order #12345"
 }
 ```
 
@@ -193,12 +172,12 @@ PSU-IP-Address: {ip}
 ```json
 {
   "transactionStatus": "RCVD",
-  "paymentId": "1234-pay-983",
+  "paymentId": "1234-wertiq-983",
   "_links": {
     "scaRedirect": { "href": "https://www.bog.ge/authorize/..." },
-    "self": { "href": "/psd2/v1/payments/1234-pay-983" },
-    "status": { "href": "/psd2/v1/payments/1234-pay-983/status" },
-    "scaStatus": { "href": "/psd2/v1/payments/1234-pay-983/authorisations/123auth456" }
+    "self": { "href": "/psd2/v1/payments/1234-wertiq-983" },
+    "status": { "href": "/psd2/v1/payments/1234-wertiq-983/status" },
+    "scaStatus": { "href": "/psd2/v1/payments/1234-wertiq-983/authorisations/123auth456" }
   }
 }
 ```
@@ -208,26 +187,27 @@ For OAuth2 flow the response includes:
 { "_links": { "scaOAuth": { "href": "https://api.bog.ge/.well-known/..." } } }
 ```
 
+For embedded flow:
+```json
+{ "_links": { "startAuthorisationWithPsuAuthentication": { "href": "..." } } }
+```
+
 ### Get Payment Status
 
 ```http
-GET /0.8/psd2/v1/payments/{paymentProduct}/{paymentId}/status
-X-Request-ID: {uuid}
+GET https://xs2a-sandbox.bog.ge/0.8/v1/{payment-service}/{payment-product}/{paymentId}/status
+Host: xs2a-sandbox.bog.ge
+X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721
+PSU-IP-Address: 192.168.8.78
 ```
 
-### Manage Payment Authorisations
-
-Retrieve all authorisation sub-resources or check a specific SCA status.
+### Start Payment Authorization
 
 ```http
-GET /0.8/psd2/v1/payments/{paymentProduct}/{paymentId}/authorisations
-GET /0.8/psd2/v1/payments/{paymentProduct}/{paymentId}/authorisations/{authorisationId}
-GET /0.8/v1/{paymentService}/{paymentProduct}/{paymentId}/cancellation-authorisations/{authorisationId}
-```
-
-**Response (Cancellation Status):**
-```json
-{ "scaStatus": "psuAuthenticated" }
+POST /0.8/psd2/v1/payments/{paymentProduct}/{paymentId}/authorisations
+Authorization: Bearer {token}
+X-Request-ID: {uuid}
+PSU-IP-Address: {ip}
 ```
 
 ## Signing Baskets (Batch Authorization)
