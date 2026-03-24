@@ -137,6 +137,24 @@ For utility/telecom service providers accepting payments via BOG interfaces. Sup
 
 → Read `references/merchant-documents.md`
 
+## Scripts
+
+### Validate Endpoints
+Check that all BOG API endpoints are reachable:
+```bash
+bash scripts/validate_endpoints.sh           # Run validation
+bash scripts/validate_endpoints.sh --verbose  # With explanations
+```
+
+### Scrape Latest Documentation
+Fetch latest docs from BOG developer portals and compare against current references:
+```bash
+python scripts/scrape_docs.py                          # Show diff summary
+python scripts/scrape_docs.py --output /tmp/bog-docs   # Save scraped content
+python scripts/scrape_docs.py --firecrawl              # Use Firecrawl for JS pages (set FIRECRAWL_API_KEY)
+python scripts/scrape_docs.py --json                   # JSON output
+```
+
 ## Response Conventions
 
 - Monetary amounts are **strings** (`"amount": "100.50"`)

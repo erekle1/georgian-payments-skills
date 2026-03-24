@@ -1,145 +1,159 @@
 # TBC Online Installment Loans
 
+Allows merchants to offer TBC installment loan products at checkout. Customer is redirected to TBC to complete the loan application.
+
+---
+
 ## Base URLs
 
 | Environment | URL |
 |-------------|-----|
-| Test | `https://test-api.tbcbank.ge` |
+| Testing | `https://test-api.tbcbank.ge` |
 | Production | `https://api.tbcbank.ge` |
 
-Authentication: Bearer token in `Authorization` header.
+Authentication: `Bearer {access_token}` (OAuth2 client credentials) and `apikey` header.
 
 ---
 
-## Create Application
+## Endpoints
+
+### Create Application
 
 ```http
 POST /v1/online-installments/applications
-Authorization: Bearer {token}
-apikey: {api_key}
+Authorization: Bearer {access_token}
 Content-Type: application/json
+apikey: {your-api-key}
+```
 
+```json
 {
-  "merchantKey": "your_merchant_key",
-  "campaignId": "campaign_id",
+  "merchantKey": "your-merchant-key",
+  "campaignId": "campaign-abc",
   "priceTotal": 1500.00,
   "products": [
-    { "name": "Samsung TV", "price": 1500.00, "quantity": 1 }
+    {
+      "name": "Samsung TV 55\"",
+      "price": 1500.00,
+      "quantity": 1
+    }
   ],
-  "invoiceId": "SHOP-ORDER-001"
+  "invoiceId": "YOUR-ORDER-123"
 }
 ```
 
-**Response:** HTTP 200 with `Location` header containing redirect URL for customer.
-- `sessionId` in response body — use for subsequent operations
-- `Id` field always returns null (ignore it)
+**Response (201 Created):**
+```
+Location: https://tbcbank.ge/installments/session/{session-id}
+```
 
-Redirect customer to URL from `Location` header to fill loan application.
+```json
+{
+  "sessionId": "abc-123-def-456"
+}
+```
+
+Redirect the customer to the `Location` header URL. The customer completes the loan application on TBC's side.
 
 ---
 
-## Cancel Application
+### Cancel Application
 
 ```http
 POST /v1/online-installments/applications/{session-id}/cancel
-Authorization: Bearer {token}
-apikey: {api_key}
+Authorization: Bearer {access_token}
+apikey: {your-api-key}
 ```
+
+Cancels a pending installment application. Use when the customer cancels the order on your side before TBC processes it.
 
 ---
 
-## Confirm Application
+### Confirm Application
 
 ```http
 POST /v1/online-installments/applications/{session-id}/confirm
-Authorization: Bearer {token}
-apikey: {api_key}
+Authorization: Bearer {access_token}
+apikey: {your-api-key}
 ```
+
+Merchant-side confirmation after the loan has been approved by TBC. Required to finalize the installment and trigger disbursement.
 
 ---
 
-## Check Application Status
+### Get Application Status
 
 ```http
 GET /v1/online-installments/applications/{session-id}/status
-Authorization: Bearer {token}
-apikey: {api_key}
-```
-
----
-
-## Merchant Status Changes (Polling)
-
-```http
-GET /v1/online-installments/merchant/applications/status-changes
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "merchantKey": "your_merchant_key",
-  "take": 100
-}
+Authorization: Bearer {access_token}
+apikey: {your-api-key}
 ```
 
 **Response:**
 ```json
 {
-  "synchronizationRequestId": "req-uuid",
-  "totalCount": 5,
-  "statusChanges": [
-    {
-      "sessionId": "session-uuid",
-      "statusId": 1,
-      "statusDescription": "In Progress",
-      "changeDate": "2024-01-15 10:30:00.0",
-      "amount": 1500.00,
-      "contributionAmount": 0.00
-    }
-  ]
+  "sessionId": "abc-123-def-456",
+  "status": "Approved",
+  "invoiceId": "YOUR-ORDER-123"
 }
 ```
 
-### Confirm Synchronization
+Possible statuses: `Pending`, `Approved`, `Confirmed`, `Canceled`, `Rejected`, `Expired`.
+
+---
+
+### Poll Status Changes (Merchant-Level)
+
+```http
+GET /v1/online-installments/merchant/applications/status-changes?merchantKey={key}&take={count}
+Authorization: Bearer {access_token}
+apikey: {your-api-key}
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `merchantKey` | string | Your merchant identifier |
+| `take` | integer | Number of status change records to retrieve |
+
+Returns a batch of status changes across all applications for your merchant. Use this for periodic polling instead of checking each session individually.
+
+---
+
+### Sync Status Changes
 
 ```http
 POST /v1/online-installments/merchant/applications/status-changes-sync
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{ "synchronizationRequestId": "req-uuid" }
+Authorization: Bearer {access_token}
+apikey: {your-api-key}
 ```
 
----
-
-## Status IDs
-
-| ID | Description |
-|----|-------------|
-| 0 | Pending client authentication |
-| 1 | In Progress |
-| (2-13) | Various processing/completion states |
+Acknowledges received status changes so they are not returned again by the polling endpoint. Call this after you have processed the batch from `status-changes`.
 
 ---
 
-## Go-Live
+## Go-Live Process
 
-Email `merchant.support@tbcbank.ge` to receive:
-- `merchantKey` — Unique merchant identifier
-- `campaignId` — Campaign identifier for installment terms
+1. **Get credentials**: Email `merchant.support@tbcbank.ge` to request your `merchantKey` and `campaignId`.
+2. **Integrate and test**: Use the test environment (`test-api.tbcbank.ge`) to create applications and verify the full flow.
+3. **Submit test results**: Send two `sessionId` values to `developers@tbcbank.ge`:
+   - One application that reached **COMPLETE** status
+   - One application that reached **CANCELED** status
+4. TBC reviews and enables production access.
 
 ---
 
-## Testing Flow
+## Error Responses
 
-1. Get access token
-2. Call `POST /v1/online-installments/applications` to initiate
-3. Get `sessionId` from response
-4. Test cancel: `POST /v1/online-installments/applications/{session-id}/cancel`
-5. Test confirm: `POST /v1/online-installments/applications/{session-id}/confirm`
-6. `Location` header has redirect URL for customer
-7. Send one COMPLETE and one CANCELED sessionId to `developers@tbcbank.ge`
+| HTTP Status | Meaning |
+|-------------|---------|
+| `400` | Missing or invalid parameters (e.g., no `merchantKey`, invalid `campaignId`) |
+| `401` | Session expired or invalid authentication |
+| `404` | Merchant not found — verify your `merchantKey` is correct |
 
-**Common errors:**
-- 404: Merchant not found or deactivated
-- 400: Missing/invalid parameters
-- 401: Expired session or token
+```json
+{
+  "status": 400,
+  "title": "Bad Request",
+  "detail": "merchantKey is required"
+}
+```

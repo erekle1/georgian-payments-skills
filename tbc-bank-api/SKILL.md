@@ -133,6 +133,24 @@ TBC brand colors (`#00AEEF` primary blue), button variants, input styles, typogr
 
 → Read `references/merchant-integration.md`
 
+## Scripts
+
+### Validate Endpoints
+Check that all TBC API endpoints are reachable:
+```bash
+bash scripts/validate_endpoints.sh           # Run validation
+bash scripts/validate_endpoints.sh --verbose  # With explanations
+```
+
+### Scrape Latest Documentation
+Fetch latest docs from developers.tbcbank.ge and compare against current references:
+```bash
+python scripts/scrape_docs.py                          # Show diff summary
+python scripts/scrape_docs.py --output /tmp/tbc-docs   # Save scraped content
+python scripts/scrape_docs.py --firecrawl              # Use Firecrawl for JS pages (set FIRECRAWL_API_KEY)
+python scripts/scrape_docs.py --json                   # JSON output
+```
+
 ## Response Conventions
 
 - Monetary amounts are **decimal numbers** (`"amount": 100.50`)

@@ -1,165 +1,238 @@
-# TBC Merchant Design Guidelines
+# TBC Design Guidelines
 
-Branding and UI requirements for merchants integrating TBC payment components.
-
-Source: `https://developers.tbcbank.ge/docs/design`
+Design specifications from `developers.tbcbank.ge/docs/design` for TBC-branded payment UI components.
 
 ---
 
-## Color Palette
+## Colors
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| TBC Blue (primary) | `#00AEEF` | CTAs, links, focused inputs, active indicators |
-| Dark Blue | `#0C2B43` | Text, headings, dark elements |
-| White | `#FFFFFF` | Backgrounds, text on dark |
-| Gray 1 | `#737373` | Secondary text, descriptions |
-| Background Gray | `#FAFBFC` | Card backgrounds, sections |
-| Error Red | `#eb4949` | Validation errors, error borders |
-| Dark Gray | `#555F62` | Monochrome icons/elements |
-| Border Gray | `#DADADA` | Default input borders, dividers |
+| Name | Hex | Usage |
+|------|-----|-------|
+| TBC Blue | `#00AEEF` | Primary actions, links, active states |
+| Dark Blue | `#0C2B43` | Text headings, dark backgrounds |
+| Error Red | `#eb4949` | Validation errors, destructive actions |
+| Gray 1 | `#F5F5F5` | Page backgrounds, disabled inputs |
+| Gray 2 | `#E0E0E0` | Borders, dividers |
+| Gray 3 | `#9E9E9E` | Placeholder text, secondary labels |
+| Gray 4 | `#616161` | Body text |
+| White | `#FFFFFF` | Card backgrounds, button text on dark |
 
 ---
 
 ## Typography
 
-**Font family:** `TBC Sailec Regular`
+**Font family**: TBC Sailec Regular
 
-Font CDN: `https://openapiportalobjects.tbcbank.ge/fonts/`
+Load from TBC's CDN:
 
-| Level | Size | Weight | Color |
-|-------|------|--------|-------|
-| Main Title | 40px | Bold, uppercase | `#0E2536` |
-| Blue Title | 24px | Normal, uppercase | `#00AEEF` |
-| H2 | 15px | Bold | `#0E2536` |
-| H3 | — | 700 | `#555` |
-| Card Title | 18px | — | `#0C2B43` |
-| Body/Description | 14px | Normal | `#737373` |
-| Date/Accent | 14px | Bold | `#00AEEF` |
+```css
+@font-face {
+  font-family: 'TBC Sailec';
+  src: url('https://openapiportalobjects.tbcbank.ge/fonts/TBCSailecRegular.woff2') format('woff2'),
+       url('https://openapiportalobjects.tbcbank.ge/fonts/TBCSailecRegular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+```
 
 ---
 
-## Payment Button Styles
+## Buttons
 
-TBC logo SVG: 24×24px viewBox. Four button variants:
+Four button variants available:
 
-### 1. TBC Blue (Primary CTA)
+### Blue (Primary)
+
 ```css
-.tbcButtonBlue {
-  background: #00AEEF;
+.tbcButton.tbcButtonBlue {
+  background-color: #00AEEF;
   color: #FFFFFF;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-family: 'TBC Sailec', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tbcButton.tbcButtonBlue:hover {
+  background-color: #0099D6;
 }
 ```
-Use for primary "Pay with TBC" actions.
 
-### 2. Light (Secondary)
+### Light (Secondary)
+
 ```css
-.tbcButtonLight {
-  background: #FFFFFF;
+.tbcButton.tbcButtonLight {
+  background-color: #FFFFFF;
+  color: #00AEEF;
+  border: 1px solid #00AEEF;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-family: 'TBC Sailec', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tbcButton.tbcButtonLight:hover {
+  background-color: #F0FAFF;
+}
+```
+
+### Light Monochrome
+
+```css
+.tbcButton.tbcButtonLightMono {
+  background-color: #FFFFFF;
+  color: #0C2B43;
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-family: 'TBC Sailec', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tbcButton.tbcButtonLightMono:hover {
+  background-color: #F5F5F5;
+}
+```
+
+### Dark Monochrome
+
+```css
+.tbcButton.tbcButtonDarkMono {
+  background-color: #0C2B43;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-family: 'TBC Sailec', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tbcButton.tbcButtonDarkMono:hover {
+  background-color: #0A2235;
+}
+```
+
+---
+
+## Text Input
+
+```css
+.tbcInput {
+  width: 300px;
+  height: 50px;
+  border: 1px solid #E0E0E0;
+  border-radius: 4px;
+  padding: 16px 12px 4px;
+  font-family: 'TBC Sailec', sans-serif;
+  font-size: 14px;
+  color: #0C2B43;
+  position: relative;
+}
+
+.tbcInput:focus {
   border-color: #00AEEF;
+  outline: none;
+}
+
+.tbcInput.error {
+  border-color: #eb4949;
+}
+
+/* Animated floating label */
+.tbcInput-label {
+  position: absolute;
+  left: 12px;
+  top: 16px;
+  font-size: 14px;
+  color: #9E9E9E;
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.tbcInput:focus + .tbcInput-label,
+.tbcInput.filled + .tbcInput-label {
+  top: 4px;
+  font-size: 10px;
   color: #00AEEF;
 }
-```
-White background with blue border and text.
 
-### 3. Light Monochrome (Tertiary)
-```css
-.tbcButtonLightMonochrome {
-  color: #555F62;
+.tbcInput.error + .tbcInput-label {
+  color: #eb4949;
+}
+
+/* Error message */
+.tbcInput-error {
+  font-size: 12px;
+  color: #eb4949;
+  margin-top: 4px;
 }
 ```
-Minimal contrast, for secondary actions on light backgrounds.
-
-### 4. Dark Monochrome (Inverse)
-```css
-.tbcButtonDarkMonochrome {
-  background: dark;
-  color: #FFFFFF;
-}
-```
-For use on dark backgrounds.
-
-### Button Layout Options
-- Full width: text + icon
-- Text only: `.upperCase` or lowercase
-- Icon only: `.tbcButtonIconOnly`
-
-### CSS Classes
-```
-.tbcButton              /* Base */
-.tbcButtonBlue          /* Primary */
-.tbcButtonLight         /* Secondary */
-.tbcButtonLightMonochrome  /* Tertiary */
-.tbcButtonDarkMonochrome   /* Inverse */
-.tbcButtonIconOnly      /* Icon only */
-.upperCase              /* Uppercase text */
-```
-
----
-
-## Text Input Component
-
-| Property | Value |
-|----------|-------|
-| Width | 300px |
-| Height | 50px (default), 30px (focused) |
-| Border | 2px solid |
-| Default border | `#DADADA` |
-| Focused border | `#00AEEF` |
-| Error border | `#eb4949` |
-| Disabled bg | `#FAFAFA` |
-
-Features: animated labels, error states with red icon + message, validation indicators.
 
 ---
 
 ## Card Component
 
 ```css
-.card {
-  background: #FAFBFC;
-  border: 1px solid #DCDCDC;
-  border-radius: 4px;
-}
-.card:hover {
+.tbcCard {
   background: #FFFFFF;
-  box-shadow: 0px 16px 32px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+}
+
+.tbcCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 ```
-
-- Image height: 188–200px
-- Title: 18px, `#0C2B43`, 72px height
-- Description: 14px, `#737373`, min 96px
-- Date: 14px, bold, `#00AEEF`
 
 ---
 
 ## Layout
 
-| Token | Value |
-|-------|-------|
-| Container max-width | 1140px |
-| Container-lg | 1440px |
-| Standard shadow | `0px 16px 32px 8px rgba(0, 0, 0, 0.05)` |
-| Transition | 0.5s default, 0.3s mobile menu |
+| Property | Value |
+|----------|-------|
+| Container max-width | `1140px` |
+| Container padding | `0 15px` |
+| Container margin | `0 auto` |
 
 ### Responsive Breakpoints
-- `990px` — Hide desktop nav
-- `768px` — Mobile layout, hide header
-- `770px` — Adjust search, footer
+
+| Breakpoint | Max-width | Usage |
+|------------|-----------|-------|
+| Desktop | `>990px` | Full layout |
+| Tablet | `990px` | Collapse side panels |
+| Mobile | `768px` | Stack columns |
+| Small mobile | `770px` | Compact spacing |
+
+```css
+.tbcContainer {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+@media (max-width: 990px) {
+  .tbcContainer { padding: 0 20px; }
+}
+
+@media (max-width: 768px) {
+  .tbcContainer { padding: 0 16px; }
+}
+```
 
 ---
 
 ## Logo
 
-- Header logo: 45×40px
-- Source: `https://files.readme.io/106fbe7-small-bluelogo_v1.png`
-- SVG button icon: 24×24px, fill colors vary by button variant
+| Placement | Dimensions |
+|-----------|------------|
+| Header logo | `45px x 40px` |
+| Button icon (SVG) | `24px x 24px` |
 
----
-
-## Links
-
-- Color: `#00AEEF`
-- Hover: darker variant
-- Text-decoration: none
+Use the TBC logo assets provided through the developer portal. Do not modify colors or proportions.
