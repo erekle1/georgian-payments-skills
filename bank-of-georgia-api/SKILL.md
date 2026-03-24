@@ -6,8 +6,12 @@ description: >
   (BOnline) corporate banking, Payment Gateway (billing/service providers), and banking products.
   Covers both bank-side API usage AND merchant-side implementation: webhook/callback handlers, redirect URLs,
   idempotency, environment setup, registration documents, and go-live checklist.
+  Also generates merchant integration documents (technical specs, go-live checklists, service provider specs,
+  SDK integration details) in markdown format — use when the user needs to prepare documentation that BOG
+  requires from merchants.
   Use this skill whenever the user mentions Bank of Georgia, BOG, bog.ge, api.bog.ge, iPay, BOG installments,
-  BOG SDK, BOG-ID, BOnline, Georgian bank integration, callback handling, merchant registration, or any BOG-related development.
+  BOG SDK, BOG-ID, BOnline, Georgian bank integration, callback handling, merchant registration,
+  merchant documentation, integration docs, go-live checklist, or any BOG-related development.
   Trigger even if they just say "BOG" in a tech/banking context.
 ---
 
@@ -29,6 +33,7 @@ End-to-end reference for integrating BOG payment services — covering both the 
 | Payment Gateway (Billing) | `references/payment-gateway.md` |
 | **Merchant Integration Guide** | **`references/merchant-integration.md`** |
 | **Merchant Registration & Documents** | **`references/merchant-documents.md`** |
+| **Merchant Doc Generator** | **`references/merchant-doc-generator.md`** |
 
 ## Base URLs
 
@@ -136,6 +141,22 @@ For utility/telecom service providers accepting payments via BOG interfaces. Sup
 4. Submit go-live request after sandbox testing
 
 → Read `references/merchant-documents.md`
+
+### 8. Generate Merchant Documentation
+When the user needs to prepare documents that BOG requires — technical specs, go-live checklists, service provider specs, or SDK integration details — generate markdown docs using the templates.
+
+1. Ask which integration type(s) they're using
+2. Gather their company info, URLs, and tech stack
+3. Generate the appropriate markdown document from templates
+4. Save to their project directory (e.g., `docs/bog-integration-spec.md`)
+
+Available templates:
+- **Integration Technical Specification** — full technical spec for BOG submission
+- **Payment Gateway / Service Provider Specification** — for billing/utility providers
+- **Go-Live Readiness Checklist** — pre-launch document with business docs + technical readiness
+- **SDK Integration Details** — for BOG.Calculator / SmartButton implementations
+
+→ Read `references/merchant-doc-generator.md`
 
 ## Scripts
 

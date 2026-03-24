@@ -1,13 +1,18 @@
 ---
 name: tbc-bank-api
 description: >
-  Expert guide for integrating TBC Bank's APIs — Checkout (TPay) e-commerce payments, online installment loans,
-  exchange rates, Open Banking PSD2 (AIS, PIS), TBC ID, QR payments, mortgage leads, and DBI integration service.
+  Expert guide for integrating TBC Bank's APIs — Checkout (TPay) e-commerce payments, XML billing protocol
+  (CHECK/PAY for service providers), online installment loans, exchange rates, Open Banking PSD2 (AIS, PIS),
+  TBC ID, QR payments, mortgage leads, and DBI integration service.
   Covers both bank-side API usage AND merchant-side implementation: callback/webhook handlers, redirect URLs,
   signature verification, environment setup, registration documents, and go-live checklist.
+  Also generates merchant integration documents (technical specs, go-live checklists, billing protocol specs)
+  in markdown format — use when the user needs to prepare documentation that TBC requires from merchants.
   Use this skill whenever the user mentions TBC Bank, tbcbank.ge, TBC API, TPay, TBC checkout,
-  TBC installments, TBC exchange rates, TBC Open Banking, PSD2 with TBC, TBC ID,
-  callback handling, merchant registration with TBC, or any TBC Bank developer API work.
+  TBC installments, TBC exchange rates, TBC Open Banking, PSD2 with TBC, TBC ID, TBC billing,
+  TBC XML protocol, CHECK/PAY protocol, service provider integration with TBC,
+  callback handling, merchant registration with TBC, merchant documentation, integration docs,
+  go-live checklist, or any TBC Bank developer API work.
   Trigger even if they just say "TBC" in a banking/payments context.
 ---
 
@@ -21,12 +26,14 @@ End-to-end reference for integrating TBC Bank payment and banking services — c
 |-------|---------------|
 | Authentication & Certificates | `references/auth.md` |
 | Checkout / TPay (E-Commerce) | `references/checkout.md` |
+| XML Billing Protocol (CHECK/PAY) | `references/xml-billing-protocol.md` |
 | Online Installment Loans | `references/installments.md` |
 | Exchange Rates API | `references/exchange-rates.md` |
 | Open Banking / PSD2 + DBI | `references/openbanking.md` |
 | Error Handling & Codes | `references/errors.md` |
 | Design & Branding Guidelines | `references/design.md` |
 | **Merchant Integration Guide** | **`references/merchant-integration.md`** |
+| **Merchant Doc Generator** | **`references/merchant-doc-generator.md`** |
 
 ## Base URLs
 
@@ -88,7 +95,18 @@ Content-Type: application/json
 
 → Read `references/checkout.md`
 
-### 4. Online Installment Loans
+### 4. XML Billing Protocol (Service Provider Payments)
+For service/utility providers where TBC sends CHECK/PAY requests **to your server**. This is the reverse of TPay — here you expose an endpoint and TBC calls it.
+
+1. Expose HTTPS endpoint (e.g., `/billing/`)
+2. Handle `command=check` — validate account, return customer info + debt as XML
+3. Handle `command=pay` — apply payment using `txn_id` for deduplication, return result XML
+4. Result codes: `0` = success, `1`/`300` = retry, `5` = not found, `215` = duplicate
+5. Security: agree with TBC on VPN, SSL, IP filtering, or field hashing
+
+→ Read `references/xml-billing-protocol.md`
+
+### 5. Online Installment Loans
 1. Create application → get `sessionId` + redirect URL
 2. Redirect customer to fill loan application
 3. Poll status or confirm/cancel application
@@ -96,27 +114,27 @@ Content-Type: application/json
 
 → Read `references/installments.md`
 
-### 5. Exchange Rates
+### 6. Exchange Rates
 - Commercial: `GET /v1/exchange-rates/commercial`
 - Official (NBG): `GET /v1/exchange-rates/nbg`
 - Convert: `GET /v1/exchange-rates/{type}/convert?amount=X&from=USD&to=GEL`
 
 → Read `references/exchange-rates.md`
 
-### 6. Authentication
+### 7. Authentication
 → Read `references/auth.md` first — covers OAuth2, apikey, mTLS certificates, DBI auth
 
-### 7. Open Banking / PSD2
+### 8. Open Banking / PSD2
 Account movements, statements, payment initiation via PSD2 standard with mTLS.
 
 → Read `references/openbanking.md`
 
-### 8. Design & Branding
+### 9. Design & Branding
 TBC brand colors (`#00AEEF` primary blue), button variants, input styles, typography (`TBC Sailec Regular`), and card components for merchant payment UI.
 
 → Read `references/design.md`
 
-### 9. Merchant Integration (What YOU Must Build)
+### 10. Merchant Integration (What YOU Must Build)
 1. Set up callback endpoint (HTTPS, returns 200, idempotent)
 2. Whitelist TBC IPs: `193.104.20.44/45`, `185.52.80.44/45`
 3. After receiving callback, GET payment details to verify status and amount
@@ -125,13 +143,28 @@ TBC brand colors (`#00AEEF` primary blue), button variants, input styles, typogr
 
 → Read `references/merchant-integration.md`
 
-### 10. Go-Live
+### 11. Go-Live
 - **Checkout:** Ensure website has Terms, Return Policy, Privacy Policy, Delivery Policy, Contact Info → activate via dashboard
 - **Installments:** Email `merchant.support@tbcbank.ge` for production keys
 - **Exchange Rates:** Automatic after testing
 - **PSD2:** Certificate from authorized provider + TBC approval
 
 → Read `references/merchant-integration.md`
+
+### 12. Generate Merchant Documentation
+When the user needs to prepare documents that TBC requires — technical specs, go-live checklists, or billing protocol specifications — generate markdown docs using the templates.
+
+1. Ask which integration type(s) they're using
+2. Gather their company info, URLs, and tech stack
+3. Generate the appropriate markdown document from templates
+4. Save to their project directory (e.g., `docs/tbc-integration-spec.md`)
+
+Available templates:
+- **Integration Technical Specification** — full technical spec for TBC submission
+- **XML Billing Protocol Specification** — for service providers using CHECK/PAY
+- **Go-Live Readiness Checklist** — pre-launch document with business docs + technical readiness
+
+→ Read `references/merchant-doc-generator.md`
 
 ## Scripts
 
