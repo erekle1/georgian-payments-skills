@@ -34,6 +34,7 @@ End-to-end reference for integrating BOG payment services — covering both the 
 | **Merchant Integration Guide** | **`references/merchant-integration.md`** |
 | **Merchant Registration & Documents** | **`references/merchant-documents.md`** |
 | **Merchant Doc Generator** | **`references/merchant-doc-generator.md`** |
+| **Postman Collection Generator** | **`references/postman-collection.md`** |
 
 ## Base URLs
 
@@ -175,6 +176,75 @@ python scripts/scrape_docs.py --output /tmp/bog-docs   # Save scraped content
 python scripts/scrape_docs.py --firecrawl              # Use Firecrawl for JS pages (set FIRECRAWL_API_KEY)
 python scripts/scrape_docs.py --json                   # JSON output
 ```
+
+### When to Run Scrape Scripts
+
+Run `scrape_docs.py` in these situations — this keeps your reference files accurate and prevents implementing against stale API contracts:
+
+1. **Before starting any new BOG integration** — ensures you're coding against the latest API spec, not outdated references
+2. **When you encounter unexpected API errors** (401, 404, changed response shapes) — BOG may have updated endpoints, auth flows, or SDK versions
+3. **When the user says "check for updates"** or mentions BOG recently changed something
+4. **Periodically during active development** — run at least once per sprint or weekly during integration work
+5. **Before generating merchant documentation** — so generated docs reflect the current API state
+6. **After BOG SDK version changes** — the SDK script URL includes a version parameter that may change
+
+After scraping, review the diff summary. If changes are found, update the relevant `references/*.md` files before proceeding with implementation.
+
+Run `validate_endpoints.sh` before any go-live checklist or when switching between sandbox and production environments.
+
+## Naming Conventions (Skill-Specific)
+
+Every artifact created using this skill MUST use BOG-specific naming to avoid collisions with other bank integrations (e.g., TBC). This matters because Georgian merchants frequently integrate both TBC and BOG simultaneously.
+
+### File Naming
+
+| Artifact Type | Naming Pattern | Example |
+|---------------|---------------|---------|
+| Webhook/callback handler | `bog-*.{ext}` | `bog-ipay-webhook.ts`, `bog-callback-handler.py` |
+| Service/module | `bog-*.{ext}` | `bog-ipay-service.ts`, `bog-auth.py` |
+| Config/env keys | `BOG_*` | `BOG_CLIENT_ID`, `BOG_SECRET_KEY`, `BOG_WEBHOOK_URL` |
+| Route prefix | `/bog/*` or `/webhooks/bog/*` | `/webhooks/bog/ipay`, `/api/bog/installments` |
+| Documentation | `bog-*.md` | `bog-integration-spec.md`, `bog-go-live-checklist.md` |
+| Postman collection | `bog-*.postman_collection.json` | `bog-ipay-api.postman_collection.json` |
+| Test files | `bog-*.test.{ext}` | `bog-ipay.test.ts`, `test_bog_payment.py` |
+| Docker/compose | `bog-*` | `bog-payment-service` (container name) |
+| Database tables/columns | `bog_*` | `bog_order_id`, `bog_transaction_log` |
+
+### Code Naming
+
+```
+// Classes/modules: prefix with Bog
+class BogIpayService { ... }
+class BogInstallmentHandler { ... }
+
+// Functions: prefix with bog
+function bogCreateOrder() { ... }
+function bogVerifyWebhook() { ... }
+
+// Constants
+const BOG_SANDBOX_URL = "https://ipay.ge"
+const BOG_PRODUCTION_URL = "https://api.bog.ge"
+const BOG_SDK_URL = "https://webstatic.bog.ge/bog-sdk/bog-sdk.js"
+```
+
+### Why This Matters
+When a project integrates both TBC and BOG, generic names like `payment-webhook.ts` or `CLIENT_SECRET` become ambiguous. BOG-specific prefixes make the codebase navigable and prevent subtle bugs from routing payments to the wrong handler.
+
+## Postman Collection Generation
+
+When creating documentation or implementing an integration, ALSO generate a Postman collection for the **merchant's own endpoints** — the webhook handlers, callback receivers, service provider endpoints, and auth redirect handlers the merchant builds on their server. No bank-side URLs (bog.ge, ipay.ge) in these collections.
+
+→ Read `references/postman-collection.md` for collection templates and generation instructions
+
+### Quick Postman Generation
+
+For each integration type, generate a `bog-{type}-merchant.postman_collection.json` with:
+- Pre-configured environments (local dev + staging)
+- All merchant-side endpoints with simulated BOG request bodies
+- Test scripts that validate response codes, timeouts, and idempotency
+- Variables for `{{merchant_base_url}}`, `{{bog_order_id}}`, `{{bog_transaction_id}}`
+
+Save Postman files to the user's project directory (e.g., `docs/postman/bog-ipay-merchant.postman_collection.json`).
 
 ## Response Conventions
 

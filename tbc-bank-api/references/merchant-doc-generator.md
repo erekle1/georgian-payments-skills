@@ -290,10 +290,49 @@ Generate this when merchant is preparing to go live with TBC.
 
 ---
 
+## Postman Collection Output
+
+Every documentation generation MUST also produce a corresponding Postman collection. This is not optional — developers need testable API surfaces alongside written docs.
+
+### What to Generate
+
+When generating docs for any integration type, also create:
+
+1. **Postman collection** — `tbc-{type}.postman_collection.json` with all endpoints for that integration
+2. **Environment files** — `tbc-sandbox.postman_environment.json` and `tbc-production.postman_environment.json`
+
+### File Output Structure
+
+```
+docs/
+├── tbc-integration-spec.md              # Markdown documentation
+├── tbc-go-live-checklist.md             # Go-live checklist
+├── tbc-billing-protocol-spec.md         # XML billing spec (if applicable)
+└── postman/
+    ├── tbc-checkout-merchant.postman_collection.json
+    ├── tbc-installments-merchant.postman_collection.json
+    ├── tbc-billing-merchant.postman_collection.json
+    ├── tbc-oauth-merchant.postman_collection.json
+    ├── tbc-merchant-local.postman_environment.json
+    └── tbc-merchant-staging.postman_environment.json
+```
+
+Postman collections test the **merchant's own endpoints** (webhooks, callbacks, billing handlers, redirect pages) — not TBC's bank-side APIs.
+
+→ See `references/postman-collection.md` for the full Postman collection templates and structure
+
+### Naming Rule
+
+All generated files use the `tbc-` prefix. Never use generic names like `api-collection.json` or `integration-spec.md` — these collide when merchants integrate multiple banks.
+
+---
+
 ## Usage Notes
 
-- All templates output **markdown (.md)** format
+- All documentation templates output **markdown (.md)** format
+- All API collections output **Postman v2.1 JSON** format
 - Customize templates based on which integration types the merchant uses — remove irrelevant sections
 - The user fills in their specific values; the skill generates the structure
 - Documents can be exported to PDF if needed using any markdown-to-PDF tool
+- Postman collections can be imported directly into Postman or used with Newman CLI for automated testing
 - Templates are designed to match what TBC's integration team expects to receive

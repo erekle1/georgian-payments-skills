@@ -363,11 +363,51 @@ Generate this when merchant uses BOG.Calculator or BOG.SmartButton.
 
 ---
 
+## Postman Collection Output
+
+Every documentation generation MUST also produce a corresponding Postman collection. This is not optional — developers need testable API surfaces alongside written docs.
+
+### What to Generate
+
+When generating docs for any integration type, also create:
+
+1. **Postman collection** — `bog-{type}.postman_collection.json` with all endpoints for that integration
+2. **Environment files** — `bog-sandbox.postman_environment.json` and `bog-production.postman_environment.json`
+
+### File Output Structure
+
+```
+docs/
+├── bog-integration-spec.md              # Markdown documentation
+├── bog-go-live-checklist.md             # Go-live checklist
+├── bog-sdk-integration.md               # SDK details (if applicable)
+├── bog-payment-gateway-spec.md          # Service provider spec (if applicable)
+└── postman/
+    ├── bog-ipay-merchant.postman_collection.json
+    ├── bog-installments-merchant.postman_collection.json
+    ├── bog-payment-gateway-merchant.postman_collection.json
+    ├── bog-oauth-merchant.postman_collection.json
+    ├── bog-merchant-local.postman_environment.json
+    └── bog-merchant-staging.postman_environment.json
+```
+
+Postman collections test the **merchant's own endpoints** (webhooks, callbacks, service provider handlers, redirect pages) — not BOG's bank-side APIs.
+
+→ See `references/postman-collection.md` for the full Postman collection templates and structure
+
+### Naming Rule
+
+All generated files use the `bog-` prefix. Never use generic names like `api-collection.json` or `integration-spec.md` — these collide when merchants integrate multiple banks.
+
+---
+
 ## Usage Notes
 
-- All templates output **markdown (.md)** format
+- All documentation templates output **markdown (.md)** format
+- All API collections output **Postman v2.1 JSON** format
 - Customize templates based on which integration types the merchant uses — remove irrelevant sections
 - The user fills in their specific values; the skill generates the structure
 - Documents can be exported to PDF if needed using any markdown-to-PDF tool
+- Postman collections can be imported directly into Postman or used with Newman CLI for automated testing
 - Templates are designed to match what BOG's integration team expects to receive
 - Cross-reference with `references/merchant-documents.md` for the full list of required business documents

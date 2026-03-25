@@ -34,6 +34,7 @@ End-to-end reference for integrating TBC Bank payment and banking services — c
 | Design & Branding Guidelines | `references/design.md` |
 | **Merchant Integration Guide** | **`references/merchant-integration.md`** |
 | **Merchant Doc Generator** | **`references/merchant-doc-generator.md`** |
+| **Postman Collection Generator** | **`references/postman-collection.md`** |
 
 ## Base URLs
 
@@ -183,6 +184,73 @@ python scripts/scrape_docs.py --output /tmp/tbc-docs   # Save scraped content
 python scripts/scrape_docs.py --firecrawl              # Use Firecrawl for JS pages (set FIRECRAWL_API_KEY)
 python scripts/scrape_docs.py --json                   # JSON output
 ```
+
+### When to Run Scrape Scripts
+
+Run `scrape_docs.py` in these situations — this keeps your reference files accurate and prevents implementing against stale API contracts:
+
+1. **Before starting any new TBC integration** — ensures you're coding against the latest API spec, not outdated references
+2. **When you encounter unexpected API errors** (401, 404, changed response shapes) — TBC may have updated endpoints or auth requirements
+3. **When the user says "check for updates"** or mentions TBC recently changed something
+4. **Periodically during active development** — run at least once per sprint or weekly during integration work
+5. **Before generating merchant documentation** — so generated docs reflect the current API state
+
+After scraping, review the diff summary. If changes are found, update the relevant `references/*.md` files before proceeding with implementation.
+
+Run `validate_endpoints.sh` before any go-live checklist or when switching between sandbox and production environments.
+
+## Naming Conventions (Skill-Specific)
+
+Every artifact created using this skill MUST use TBC-specific naming to avoid collisions with other bank integrations (e.g., BOG). This matters because Georgian merchants frequently integrate both TBC and BOG simultaneously.
+
+### File Naming
+
+| Artifact Type | Naming Pattern | Example |
+|---------------|---------------|---------|
+| Webhook/callback handler | `tbc-*.{ext}` | `tbc-payment-callback.ts`, `tbc-webhook-handler.py` |
+| Service/module | `tbc-*.{ext}` | `tbc-checkout-service.ts`, `tbc-auth.py` |
+| Config/env keys | `TBC_*` | `TBC_CLIENT_ID`, `TBC_API_KEY`, `TBC_CALLBACK_URL` |
+| Route prefix | `/tbc/*` or `/webhooks/tbc/*` | `/webhooks/tbc/checkout`, `/api/tbc/installments` |
+| Documentation | `tbc-*.md` | `tbc-integration-spec.md`, `tbc-go-live-checklist.md` |
+| Postman collection | `tbc-*.postman_collection.json` | `tbc-checkout-api.postman_collection.json` |
+| Test files | `tbc-*.test.{ext}` | `tbc-checkout.test.ts`, `test_tbc_billing.py` |
+| Docker/compose | `tbc-*` | `tbc-billing-service` (container name) |
+| Database tables/columns | `tbc_*` | `tbc_payment_id`, `tbc_transaction_log` |
+
+### Code Naming
+
+```
+// Classes/modules: prefix with Tbc
+class TbcCheckoutService { ... }
+class TbcBillingHandler { ... }
+
+// Functions: prefix with tbc
+function tbcCreatePayment() { ... }
+function tbcVerifyCallback() { ... }
+
+// Constants
+const TBC_SANDBOX_URL = "https://test-api.tbcbank.ge"
+const TBC_PRODUCTION_URL = "https://api.tbcbank.ge"
+```
+
+### Why This Matters
+When a project integrates both TBC and BOG, generic names like `payment-callback.ts` or `MERCHANT_KEY` become ambiguous. TBC-specific prefixes make the codebase navigable and prevent subtle bugs from routing payments to the wrong handler.
+
+## Postman Collection Generation
+
+When creating documentation or implementing an integration, ALSO generate a Postman collection for the **merchant's own endpoints** — the webhook handlers, callback receivers, billing endpoints, and auth redirect handlers the merchant builds on their server. No bank-side URLs (tbcbank.ge) in these collections.
+
+→ Read `references/postman-collection.md` for collection templates and generation instructions
+
+### Quick Postman Generation
+
+For each integration type, generate a `tbc-{type}-merchant.postman_collection.json` with:
+- Pre-configured environments (local dev + staging)
+- All merchant-side endpoints with simulated TBC request bodies
+- Test scripts that validate response codes, timeouts, and idempotency
+- Variables for `{{merchant_base_url}}`, `{{tbc_payment_id}}`, `{{tbc_txn_id}}`
+
+Save Postman files to the user's project directory (e.g., `docs/postman/tbc-checkout-merchant.postman_collection.json`).
 
 ## Response Conventions
 
