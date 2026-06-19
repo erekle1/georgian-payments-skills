@@ -22,8 +22,13 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
+
+# Polite delay between requests. BOG/TBC doc portals rate-limit (HTTP 429)
+# bursty scrapers; keep this >= 1s to avoid getting blocked mid-run.
+REQUEST_DELAY_SECONDS = 1.5
 
 try:
     import requests
@@ -37,48 +42,83 @@ SCRIPT_DIR = Path(__file__).parent
 SKILL_DIR = SCRIPT_DIR.parent
 REFERENCES_DIR = SKILL_DIR / "references"
 
-# BOG documentation source URLs
+# BOG documentation source URLs.
+# Paths verified against the live English docs tree at https://api.bog.ge/docs/en/
+# (the portal restructured: the e-commerce gateway is now the "Online Payments API"
+# under /payments/*, NOT the legacy /ipay/* which is deprecated for new integrations).
+BOG_DOCS_BASE = "https://api.bog.ge/docs/en"
 BOG_SOURCES = {
     "payments": {
-        "label": "iPay / Online Payments",
+        "label": "Online Payments API (e-commerce gateway, formerly iPay)",
         "urls": [
-            "https://api.bog.ge/docs/payments/introduction",
-            "https://api.bog.ge/docs/payments/authentication",
-            "https://api.bog.ge/docs/payments/create-order",
-            "https://api.bog.ge/docs/payments/callback",
-            "https://api.bog.ge/docs/payments/refund",
-            "https://api.bog.ge/docs/payments/preauthorization",
+            f"{BOG_DOCS_BASE}/payments/introduction",
+            f"{BOG_DOCS_BASE}/payments/authentication",
+            f"{BOG_DOCS_BASE}/payments/terms-used",
+            f"{BOG_DOCS_BASE}/payments/standard-process/create-order",
+            f"{BOG_DOCS_BASE}/payments/standard-process/callback",
+            f"{BOG_DOCS_BASE}/payments/standard-process/get-payment-details",
+            f"{BOG_DOCS_BASE}/payments/preauthorization/introduction",
+            f"{BOG_DOCS_BASE}/payments/preauthorization/approve",
+            f"{BOG_DOCS_BASE}/payments/preauthorization/reject",
+            f"{BOG_DOCS_BASE}/payments/saved-card/recurrent",
+            f"{BOG_DOCS_BASE}/payments/saved-card/offline",
+            f"{BOG_DOCS_BASE}/payments/saved-card/delete",
+            f"{BOG_DOCS_BASE}/payments/refund",
+            f"{BOG_DOCS_BASE}/payments/split-payment",
+            f"{BOG_DOCS_BASE}/payments/googlepay",
+            f"{BOG_DOCS_BASE}/payments/response-codes",
+        ],
+        "reference_file": "ipay.md",
+    },
+    "link_payment": {
+        "label": "Link Payment (pay-by-link)",
+        "urls": [
+            f"{BOG_DOCS_BASE}/link-payment/introduction",
         ],
         "reference_file": "ipay.md",
     },
     "installments": {
         "label": "Installment Loans",
         "urls": [
-            "https://api.bog.ge/docs/installment/introduction",
-            "https://api.bog.ge/docs/installment/authentication",
-            "https://api.bog.ge/docs/installment/create-order",
-            "https://api.bog.ge/docs/installment/callback",
+            f"{BOG_DOCS_BASE}/installment/introduction",
+            f"{BOG_DOCS_BASE}/installment/authentication",
+            f"{BOG_DOCS_BASE}/installment/create-order",
+            f"{BOG_DOCS_BASE}/installment/callback",
         ],
         "reference_file": "installments.md",
     },
     "openbanking": {
-        "label": "Open Banking / PSD2",
+        "label": "Open Banking / Open Finance (PSD2: AIS/PIS)",
         "urls": [
-            "https://api.bog.ge/docs/openbanking/introduction",
-            "https://api.bog.ge/docs/openbanking/consents",
-            "https://api.bog.ge/docs/openbanking/accounts",
-            "https://api.bog.ge/docs/openbanking/payments",
+            f"{BOG_DOCS_BASE}/openbanking",
+            f"{BOG_DOCS_BASE}/bg-ofa-ais",
+            f"{BOG_DOCS_BASE}/bg-ofa-pis",
+            f"{BOG_DOCS_BASE}/bg-ofa-xais",
+            f"{BOG_DOCS_BASE}/bg-ofa-xpis",
         ],
         "reference_file": "openbanking.md",
+    },
+    "paymentgateway": {
+        "label": "Payment Gateway (billing / service providers)",
+        "urls": [
+            f"{BOG_DOCS_BASE}/paymentgateway/introduction",
+        ],
+        "reference_file": "payment-gateway.md",
     },
     "bogid": {
         "label": "BOG-ID (SSO)",
         "urls": [
-            "https://api.bog.ge/docs/bogid/introduction",
-            "https://api.bog.ge/docs/bogid/authentication",
-            "https://api.bog.ge/docs/bogid/userinfo",
+            f"{BOG_DOCS_BASE}/bogid/introduction",
+            f"{BOG_DOCS_BASE}/obidentity/process",
         ],
         "reference_file": "bogid.md",
+    },
+    "bonline": {
+        "label": "Business Online (corporate banking)",
+        "urls": [
+            f"{BOG_DOCS_BASE}/bonline/introduction",
+        ],
+        "reference_file": "bonline.md",
     },
 }
 
@@ -227,6 +267,8 @@ def scrape_all(use_firecrawl: bool = False) -> dict:
                 all_content.append(f"<!-- Source: {url} -->\n{content}")
             else:
                 print(f"  ⚠️  No meaningful content from {url}")
+
+            time.sleep(REQUEST_DELAY_SECONDS)
 
         if all_content:
             merged = "\n\n---\n\n".join(all_content)

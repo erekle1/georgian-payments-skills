@@ -1,18 +1,13 @@
 ---
 name: bank-of-georgia-api
 description: >
-  Expert guide for integrating Bank of Georgia (BOG) APIs — Open Banking PSD2, iPay payment gateway,
-  installment loans, BOG SDK (BOG.Calculator, BOG.SmartButton), OAuth2, BOG-ID (SSO), Business Online
-  (BOnline) corporate banking, Payment Gateway (billing/service providers), and banking products.
-  Covers both bank-side API usage AND merchant-side implementation: webhook/callback handlers, redirect URLs,
-  idempotency, environment setup, registration documents, and go-live checklist.
-  Also generates merchant integration documents (technical specs, go-live checklists, service provider specs,
-  SDK integration details) in markdown format — use when the user needs to prepare documentation that BOG
-  requires from merchants.
-  Use this skill whenever the user mentions Bank of Georgia, BOG, bog.ge, api.bog.ge, iPay, BOG installments,
-  BOG SDK, BOG-ID, BOnline, Georgian bank integration, callback handling, merchant registration,
-  merchant documentation, integration docs, go-live checklist, or any BOG-related development.
-  Trigger even if they just say "BOG" in a tech/banking context.
+  Use when integrating Bank of Georgia (BOG) payment/banking APIs or preparing the merchant
+  documentation BOG requires. Triggers: Bank of Georgia, BOG, bog.ge, api.bog.ge, iPay gateway,
+  BOG installments, BOG SDK (BOG.Calculator, BOG.SmartButton), BOG-ID SSO, Business Online (BOnline)
+  corporate banking, Payment Gateway / service-provider billing, Open Banking PSD2 (AIS/PIS), OAuth2,
+  webhook/callback handling, idempotency, merchant registration, go-live checklist, or integration
+  docs — covering both bank-side API usage and merchant-side implementation. Trigger even if the user
+  only says "BOG" in a tech/banking context.
 ---
 
 # Bank of Georgia API Integration Guide

@@ -22,8 +22,13 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
+
+# Polite delay between requests. developers.tbcbank.ge rate-limits (HTTP 429)
+# bursty scrapers; keep this >= 1s to avoid getting blocked mid-run.
+REQUEST_DELAY_SECONDS = 1.5
 
 try:
     import requests
@@ -264,6 +269,8 @@ def scrape_all(use_firecrawl: bool = False) -> dict:
                 all_content.append(f"<!-- Source: {url} -->\n{content}")
             else:
                 print(f"  ⚠️  No meaningful content from {url}")
+
+            time.sleep(REQUEST_DELAY_SECONDS)
 
         if all_content:
             merged = "\n\n---\n\n".join(all_content)

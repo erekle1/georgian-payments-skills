@@ -1,19 +1,13 @@
 ---
 name: tbc-bank-api
 description: >
-  Expert guide for integrating TBC Bank's APIs — Checkout (TPay) e-commerce payments, XML billing protocol
-  (CHECK/PAY for service providers), online installment loans, exchange rates, Open Banking PSD2 (AIS, PIS),
-  TBC ID, QR payments, mortgage leads, and DBI integration service.
-  Covers both bank-side API usage AND merchant-side implementation: callback/webhook handlers, redirect URLs,
-  signature verification, environment setup, registration documents, and go-live checklist.
-  Also generates merchant integration documents (technical specs, go-live checklists, billing protocol specs)
-  in markdown format — use when the user needs to prepare documentation that TBC requires from merchants.
-  Use this skill whenever the user mentions TBC Bank, tbcbank.ge, TBC API, TPay, TBC checkout,
-  TBC installments, TBC exchange rates, TBC Open Banking, PSD2 with TBC, TBC ID, TBC billing,
-  TBC XML protocol, CHECK/PAY protocol, service provider integration with TBC,
-  callback handling, merchant registration with TBC, merchant documentation, integration docs,
-  go-live checklist, or any TBC Bank developer API work.
-  Trigger even if they just say "TBC" in a banking/payments context.
+  Use when integrating TBC Bank payment/banking APIs or preparing the merchant documentation TBC
+  requires. Triggers: TBC Bank, tbcbank.ge, TBC API, Checkout/TPay, recurring/saved-card payments,
+  XML billing protocol (CHECK/PAY) for service providers, TBC installments, exchange rates, Open
+  Banking PSD2 (AIS/PIS) + DBI, TBC ID, QR payments, callback/webhook handling, signature
+  verification, merchant registration, go-live checklist, or integration docs — covering both
+  bank-side API usage and merchant-side implementation. Trigger even if the user only says "TBC"
+  in a banking/payments context.
 ---
 
 # TBC Bank API Integration Guide

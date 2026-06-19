@@ -18,3 +18,5 @@ venv/
 package.json
 package-lock.json
 scrape_bog.py
+.claude/
+openspec/
